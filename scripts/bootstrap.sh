@@ -156,6 +156,7 @@ export OPENCLAW_STATE_DIR="$OPENCLAW_STATE"
 # Web Terminal (ttyd)
 # ----------------------------
 WEB_TERM_PORT="${WEB_TERM_PORT:-7681}"
+WEB_TERM_PATH="${WEB_TERM_PATH:-/term}"
 WEB_TERM_USER="${WEB_TERM_USER:-openclaw}"
 WEB_TERM_PASSWORD_GENERATED="0"
 if [ -z "${WEB_TERM_PASSWORD:-}" ]; then
@@ -164,8 +165,8 @@ if [ -z "${WEB_TERM_PASSWORD:-}" ]; then
 fi
 
 if command -v ttyd >/dev/null 2>&1; then
-    ttyd -i 0.0.0.0 -p "$WEB_TERM_PORT" -c "$WEB_TERM_USER:$WEB_TERM_PASSWORD" \
-        bash -lc "cd '$WORKSPACE_DIR' && exec bash" \
+    ttyd -W -w "$WORKSPACE_DIR" -i 0.0.0.0 -p "$WEB_TERM_PORT" -b "$WEB_TERM_PATH" -c "$WEB_TERM_USER:$WEB_TERM_PASSWORD" \
+        bash \
         >/dev/null 2>&1 &
 fi
 
@@ -214,7 +215,11 @@ echo ""
 echo "🔑 Access Token: $TOKEN"
 echo ""
 echo "🌍 Service URL (Local): http://localhost:${OPENCLAW_GATEWAY_PORT:-18789}?token=$TOKEN"
-echo "🖥️  Web Terminal (Local): http://localhost:${WEB_TERM_PORT}/ (user: ${WEB_TERM_USER})"
+WEB_TERM_URL_PATH="${WEB_TERM_PATH%/}"
+if [ -z "$WEB_TERM_URL_PATH" ]; then
+    WEB_TERM_URL_PATH="/"
+fi
+echo "🖥️  Web Terminal (Local): http://localhost:${WEB_TERM_PORT}${WEB_TERM_URL_PATH}/ (user: ${WEB_TERM_USER})"
 if [ "$WEB_TERM_PASSWORD_GENERATED" = "1" ]; then
     echo "🔐 Web Terminal Password (generated): ${WEB_TERM_PASSWORD}"
 fi
