@@ -153,6 +153,23 @@ fi
 export OPENCLAW_STATE_DIR="$OPENCLAW_STATE"
 
 # ----------------------------
+# Web Terminal (ttyd)
+# ----------------------------
+WEB_TERM_PORT="${WEB_TERM_PORT:-7681}"
+WEB_TERM_USER="${WEB_TERM_USER:-openclaw}"
+WEB_TERM_PASSWORD_GENERATED="0"
+if [ -z "${WEB_TERM_PASSWORD:-}" ]; then
+    WEB_TERM_PASSWORD="$(openssl rand -hex 16 2>/dev/null || node -e "console.log(require('crypto').randomBytes(16).toString('hex'))")"
+    WEB_TERM_PASSWORD_GENERATED="1"
+fi
+
+if command -v ttyd >/dev/null 2>&1; then
+    ttyd -i 0.0.0.0 -p "$WEB_TERM_PORT" -c "$WEB_TERM_USER:$WEB_TERM_PASSWORD" \
+        bash -lc "cd '$WORKSPACE_DIR' && exec bash" \
+        >/dev/null 2>&1 &
+fi
+
+# ----------------------------
 # Sandbox setup
 # ----------------------------
 [ -f scripts/sandbox-setup.sh ] && bash scripts/sandbox-setup.sh
@@ -197,6 +214,10 @@ echo ""
 echo "🔑 Access Token: $TOKEN"
 echo ""
 echo "🌍 Service URL (Local): http://localhost:${OPENCLAW_GATEWAY_PORT:-18789}?token=$TOKEN"
+echo "🖥️  Web Terminal (Local): http://localhost:${WEB_TERM_PORT}/ (user: ${WEB_TERM_USER})"
+if [ "$WEB_TERM_PASSWORD_GENERATED" = "1" ]; then
+    echo "🔐 Web Terminal Password (generated): ${WEB_TERM_PASSWORD}"
+fi
 if [ -n "$SERVICE_FQDN_OPENCLAW" ]; then
     echo "☁️  Service URL (Public): https://${SERVICE_FQDN_OPENCLAW}?token=$TOKEN"
     echo "    (Wait for cloud tunnel to propagate if just started)"

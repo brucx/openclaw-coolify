@@ -37,6 +37,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
+# Install ttyd (web terminal)
+RUN set -eux; \
+    apt-get update; \
+    if apt-get install -y --no-install-recommends ttyd; then \
+      rm -rf /var/lib/apt/lists/*; \
+    else \
+      rm -rf /var/lib/apt/lists/*; \
+      ARCH="$(dpkg --print-architecture)"; \
+      case "$ARCH" in \
+        amd64) TTYD_ARCH="x86_64" ;; \
+        arm64) TTYD_ARCH="aarch64" ;; \
+        *) echo "Unsupported arch for ttyd: $ARCH" >&2; exit 1 ;; \
+      esac; \
+      curl -fsSL "https://github.com/tsl0922/ttyd/releases/latest/download/ttyd.${TTYD_ARCH}" -o /usr/local/bin/ttyd; \
+      chmod +x /usr/local/bin/ttyd; \
+    fi
+
 # Stage 2: System CLI tools (change occasionally)
 FROM base AS system-tools
 
@@ -127,8 +144,8 @@ RUN --mount=type=cache,target=/data/.npm \
     fi
 
 # AI Tool Suite & ClawHub
-RUN curl -fsSL https://claude.ai/install.sh | bash && \
-    curl -L https://code.kimi.com/install.sh | bash
+RUN (curl -fsSL https://claude.ai/install.sh | bash) || true && \
+    (curl -fsSL https://code.kimi.com/install.sh | bash) || true
 
 # Stage 5: Final application stage (changes frequently)
 FROM dependencies AS final
@@ -148,5 +165,5 @@ RUN ln -sf /data/.claude/bin/claude /usr/local/bin/claude 2>/dev/null || true &&
 # ✅ FINAL PATH (important)
 ENV PATH="/usr/local/go/bin:/usr/local/bin:/usr/bin:/bin:/data/.local/bin:/data/.npm-global/bin:/data/.bun/bin:/data/.bun/install/global/bin:/data/.claude/bin:/data/.kimi/bin"
 
-EXPOSE 18789
+EXPOSE 18789 7681
 CMD ["bash", "/app/scripts/bootstrap.sh"]
