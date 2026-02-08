@@ -156,6 +156,7 @@ export OPENCLAW_STATE_DIR="$OPENCLAW_STATE"
 # Web Terminal (ttyd)
 # ----------------------------
 WEB_TERM_PORT="${WEB_TERM_PORT:-7681}"
+WEB_TERM_OPENCLAW_PORT="${WEB_TERM_OPENCLAW_PORT:-7682}"
 WEB_TERM_PATH="${WEB_TERM_PATH:-/term}"
 WEB_TERM_USER="${WEB_TERM_USER:-openclaw}"
 WEB_TERM_PASSWORD_GENERATED="0"
@@ -169,7 +170,7 @@ if command -v ttyd >/dev/null 2>&1; then
         bash \
         >/dev/null 2>&1 &
 
-    ttyd -W -w "$WORKSPACE_DIR" -i 0.0.0.0 -p "$WEB_TERM_PORT" -b "/openclaw" -c "$WEB_TERM_USER:$WEB_TERM_PASSWORD" -a \
+    ttyd -W -w "$WORKSPACE_DIR" -i 0.0.0.0 -p "$WEB_TERM_OPENCLAW_PORT" -b "/openclaw" -c "$WEB_TERM_USER:$WEB_TERM_PASSWORD" -a \
         openclaw \
         >/dev/null 2>&1 &
 fi
