@@ -168,6 +168,10 @@ if command -v ttyd >/dev/null 2>&1; then
     ttyd -W -w "$WORKSPACE_DIR" -i 0.0.0.0 -p "$WEB_TERM_PORT" -b "$WEB_TERM_PATH" -c "$WEB_TERM_USER:$WEB_TERM_PASSWORD" \
         bash \
         >/dev/null 2>&1 &
+
+    ttyd -W -w "$WORKSPACE_DIR" -i 0.0.0.0 -p "$WEB_TERM_PORT" -b "/openclaw" -c "$WEB_TERM_USER:$WEB_TERM_PASSWORD" -a \
+        openclaw \
+        >/dev/null 2>&1 &
 fi
 
 # ----------------------------
