@@ -225,9 +225,7 @@ if [ -z "$WEB_TERM_URL_PATH" ]; then
     WEB_TERM_URL_PATH="/"
 fi
 echo "🖥️  Web Terminal (Local): http://localhost:${WEB_TERM_PORT}${WEB_TERM_URL_PATH}/ (user: ${WEB_TERM_USER})"
-if [ "$WEB_TERM_PASSWORD_GENERATED" = "1" ]; then
-    echo "🔐 Web Terminal Password (generated): ${WEB_TERM_PASSWORD}"
-fi
+echo "🔐 Web Terminal Password: ${WEB_TERM_PASSWORD}"
 if [ -n "$SERVICE_FQDN_OPENCLAW" ]; then
     echo "☁️  Service URL (Public): https://${SERVICE_FQDN_OPENCLAW}?token=$TOKEN"
     echo "    (Wait for cloud tunnel to propagate if just started)"
